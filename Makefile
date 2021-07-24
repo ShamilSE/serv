@@ -1,6 +1,6 @@
 NAME = webserv
-SRC = main.cpp
-CFLAGS = -Wall -Wextra -Werror -std=c++98
+SRC = main.cpp Socket/Socket.cpp
+# CFLAGS = -Wall -Wextra -Werror -std=c++98
 
 all: $(NAME)
 
