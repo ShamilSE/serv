@@ -6,14 +6,12 @@
 #include <netinet/in.h>
 #include <cstring>
 #include <unistd.h>
-#include "../Router/Router.hpp"
 
 class Socket {
 private:
 	int _socket;
 	struct sockaddr_in _addr;
-	int _connection;
-	Router router;
+	int _connection_fd;
 
 public:
 	Socket(int, int, int);

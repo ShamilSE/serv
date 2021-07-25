@@ -19,6 +19,10 @@ int main(int argc, char const *argv[])
         printf("\n Socket creation error \n");
         return -1;
     }
+    if (bind(sock, (struct sockaddr*)&serv_addr, sizeof serv_addr) == -1) {
+        perror("error.");
+        exit(1);
+    }
     
     memset(&serv_addr, '0', sizeof(serv_addr));
     
@@ -32,12 +36,12 @@ int main(int argc, char const *argv[])
         return -1;
     }
     
-    if (connect(sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0)
+    if (connect(sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) == -1)
     {
         printf("\nConnection Failed \n");
         return -1;
     }
-    send(sock , "message to server" , 18 , 0 );
+    write(sock , "message to server" , 18);
     valread = read( sock , buffer, 1024);
     return 0;
 }
