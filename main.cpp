@@ -6,5 +6,4 @@ int main(void) {
 	Socket socket(AF_INET, SOCK_STREAM, 5432);
 
 	socket.listenSocket(3);
-	socket.acceptConnection();
 }

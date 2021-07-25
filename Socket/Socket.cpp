@@ -24,11 +24,14 @@ void Socket::listenSocket(int backlog) {
 		perror("listen error");
 		exit(1);
 	}
-}
 
-int Socket::acceptConnection() {
 	while (1) {
-		_connection = accept(_socket, (struct sockaddr*)&_addr, (socklen_t*)&_addr);
+		_connection = accept(
+			_socket,
+			(struct sockaddr*)&_addr,
+			(socklen_t*)&_addr
+		);
+
 		if (_connection == -1) {
 			perror("faliled connection to a socket");
 			exit(1);
@@ -42,8 +45,10 @@ int Socket::acceptConnection() {
 			exit(1);
 		}
 		buf[bytes_read] = 0;
+		std::string request = static_cast<std::string>(buf);
+		std::string responce = router.route(request);
 
-		std::cout << buf << " read from connection" << std::endl;
+		write(_connection, responce.c_str(), responce.size());
 		close(_connection);
 	}
 }
