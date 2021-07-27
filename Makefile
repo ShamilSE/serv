@@ -1,5 +1,5 @@
 NAME = webserv
-SRC = main.cpp Socket/Socket.cpp
+SRC = main.cpp Server/Server.cpp Client/Client.cpp
 # CFLAGS = -Wall -Wextra -Werror -std=c++98
 
 all: $(NAME)
