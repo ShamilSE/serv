@@ -1,11 +1,13 @@
 // Client side C/C++ program to demonstrate Socket programming
 #include <stdio.h>
 #include <sys/socket.h>
+#include <fcntl.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <netinet/in.h>
 #include <string.h>
 #include <arpa/inet.h>
+#include <iostream>
 
 #define PORT 5432
 
@@ -35,12 +37,19 @@ int main(int argc, char const *argv[])
         printf("\nInvalid address/ Address not supported \n");
         return -1;
     }
-    
-    if (connect(sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) == -1)
+    int connect_code = connect(sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr));
+    std::cout << connect_code << std::endl;
+    if (connect_code == -1)
     {
         printf("\nConnection Failed \n");
         return -1;
     }
+    int flags = fcntl(sock, F_GETFL, 0);
+    fcntl(sock, flags, O_NONBLOCK);
+    char buf[1024];
+    int bytes_read = read(sock, buf, 14);
+    buf[bytes_read] = 0;
+    printf("%s\n", buf);
     write(sock , "message to server" , 18);
     valread = read( sock , buffer, 1024);
     return 0;
