@@ -1,12 +1,19 @@
 #pragma once
 
-#include <sys/types.h>
+#include <errno.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/select.h>
 #include <sys/socket.h>
-#include <iostream>
-#include <netinet/in.h>
-#include <cstring>
-#include <unistd.h>
+#include <signal.h>
+#include <string.h>
 #include <fcntl.h>
+#include <netinet/in.h>
+#include <unistd.h>
+#include <arpa/inet.h>
+#include <sys/types.h>
+#include <iostream>
+#include <cstring>
 #include <vector>
 #include "../Client/Client.hpp"
 #include "../SmartPointer.hpp"
@@ -20,6 +27,7 @@ private:
 	int sock, port;
 	struct sockaddr_in server_addr;
 	std::vector<Client*> clients;
+	int max_fd;
 
 	void acceptConnection();
 	void lstn(int, int);
@@ -29,6 +37,8 @@ private:
 public:
 	Server(int, int, int);
 	void listenSocket(int);
-	std::string receive(Client*);
+	void receive(Client*);
+	void send(Client*);
+	void closeConnection(Client* client);
 };
 

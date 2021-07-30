@@ -1,12 +1,15 @@
 #pragma once
 
+#include "../Request/Request.hpp"
 #include <string>
 #include <map>
 
-class Response {
+struct Response {
 	std::string startingLine;
 	std::map<std::string, std::string> headers;
 	std::string body;
 
-	Response();
+	Response(Request*);
+	void send(int);
+	std::string routing(std::string path);
 };
