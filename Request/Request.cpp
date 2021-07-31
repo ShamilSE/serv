@@ -8,6 +8,7 @@ Request::Request(std::string message) {
 	method = message.substr(0, message.find(" "));
 	tmp = toNextSymbol(message, " ");
 	path = tmp.substr(0, tmp.find(" "));
+	std::cout << "request path '" << path << "'" << std::endl;
 	tmp = toNextSymbol(tmp, " ");
 	protocolV = tmp.substr(0, tmp.find("\r"));
 	tmp = toNextSymbol(tmp, "\n");
