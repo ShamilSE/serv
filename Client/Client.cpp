@@ -10,7 +10,7 @@ void Client::log() {
 void Client::initClient() {
 	bzero(&addr, sizeof addr);
 	request = nullptr;
-	connection_fd = 0;
+	fd = 0;
 }
 
 Client::Client() {

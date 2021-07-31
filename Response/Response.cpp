@@ -1,8 +1,20 @@
 #include "Response.hpp"
 
 std::string Response::routing(std::string path) {
-	if (path == "/")
-		return "<h1>root page</h1>";
+	std::ifstream	in;
+	std::ostringstream buf;
+
+	if (path == "/") {
+
+		in.open("/Users/mismene/Desktop/serv/pages/index.html");
+		if (!in) {
+			std::cout << "cannot open index.html file" << std::endl;
+			return NULL;
+		}
+		buf << in.rdbuf();
+		return buf.str();
+	}
+
 	else
 		return "<h1>404</h1>";
 	return NULL;
@@ -19,6 +31,10 @@ void Response::send(int connection_fd) {
 		+ "\n"
 		+ "Content-Length: "
 		+ std::to_string(body.size())
+		+ "\n"
+		+ "Connection: Keep-Alive"
+		+ "\n"
+		+ "Keep-Alive: timeout=5, max=10"
 		+ "\t\n\n"
 		+ body;
 

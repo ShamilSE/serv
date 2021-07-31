@@ -14,7 +14,7 @@
 #include "../Request/Request.hpp"
 
 struct Client {
-    int connection_fd;
+    int fd;
     Request *request;
     struct sockaddr_in addr;
 

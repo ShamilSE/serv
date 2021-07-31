@@ -3,6 +3,8 @@
 #include "../Request/Request.hpp"
 #include <string>
 #include <map>
+#include <fstream>
+#include <sstream>
 
 struct Response {
 	std::string startingLine;

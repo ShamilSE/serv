@@ -15,9 +15,9 @@
 #include <iostream>
 #include <cstring>
 #include <vector>
-#include "../Client/Client.hpp"
 #include "../SmartPointer.hpp"
 #include "../Response/Response.hpp"
+#include "../Client/Client.hpp"
 
 #define MAX_CLIENTS 10
 
@@ -26,8 +26,8 @@ private:
 	fd_set wfds, rfds;
 	int sock, port;
 	struct sockaddr_in server_addr;
-	std::vector<Client*> clients;
 	int max_fd;
+	std::vector<Client*> clients;
 
 	void acceptConnection();
 	void lstn(int, int);
@@ -39,6 +39,5 @@ public:
 	void listenSocket(int);
 	void receive(Client*);
 	void send(Client*);
-	void closeConnection(Client* client);
 };
 

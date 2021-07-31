@@ -26,8 +26,6 @@ void Server::initServer(int family) {
 	server_addr.sin_family = family;
 	server_addr.sin_addr.s_addr = htonl(INADDR_ANY);
 	server_addr.sin_port = htons(port);
-	FD_ZERO(&wfds);
-	FD_ZERO(&rfds);
 	/* Set nonblock for stdin. */
 	int flag = fcntl(sock, F_GETFL, 0);
 	flag |= O_NONBLOCK;
@@ -36,8 +34,7 @@ void Server::initServer(int family) {
 }
 
 void Server::acceptConnection() {
-	SmartPointer<Client> client(new Client());
-
+	Client* client = new Client();
 	socklen_t client_len = sizeof(client->addr);
 	int connection_fd = accept(
 		sock,
@@ -49,13 +46,9 @@ void Server::acceptConnection() {
 		exit(1);
 	}
 	fcntl(connection_fd, F_SETFL, O_NONBLOCK);
-	// if (connection_fd > max_fd)
-	// 	max_fd = connection_fd;
 
-	client->log(); // info about new client
-
-	client->connection_fd = connection_fd;
-	clients.push_back(client.getPointer());
+	client->fd = connection_fd;
+	clients.push_back(client);
 }
 
 void Server::lstn(int sock, int backlog) {
@@ -66,8 +59,8 @@ void Server::lstn(int sock, int backlog) {
 }
 
 void Server::slct(int max_fd, fd_set *rfds, fd_set *wfds, fd_set *err, timeval *t) {
-	if (-1 == (select(max_fd + 1, rfds, wfds, NULL, NULL))) {
-		if (errno == EINTR) {
+	if (-1 == (select(max_fd + 1, rfds, wfds, err, t))) {
+		if (errno != EINTR) {
 			perror("select");
 			exit(1);
 		}
@@ -76,10 +69,10 @@ void Server::slct(int max_fd, fd_set *rfds, fd_set *wfds, fd_set *err, timeval *
 	}
 }
 
-void Server::receive(Client * client) {
+void Server::receive(Client* client) {
 	char buf[1024];
 
-	int bytes_read = read(client->connection_fd, buf, 1024);
+	int bytes_read = read(client->fd, buf, 1024);
 	if (bytes_read > 0) {
 		buf[bytes_read] = 0;
 		std::string str_buf(buf, bytes_read);
@@ -87,50 +80,44 @@ void Server::receive(Client * client) {
 		std::cout << "received " << bytes_read << " from client" << std::endl;
 		return;
 	}
-	// close connection if client closed connection (bytes_read == 0)
-	closeConnection(client);
+	printf("there could be error\n");
 }
 
 void Server::send(Client* client) {
 	Response response(client->request);
 
-	response.send(client->connection_fd);
-}
-
-void Server::closeConnection(Client* client) {
-	FD_CLR(client->connection_fd, &wfds);
-	FD_CLR(client->connection_fd, &rfds);
-	close(client->connection_fd);
-	// remove client from vector
-	// max_fd--;
+	response.send(client->fd);
 }
 
 void Server::listenSocket(int backlog) {
 	lstn(sock, backlog);
-	FD_SET(sock, &rfds);
-	max_fd = sock;
+	
 	while (1) {
+		max_fd = sock;
+		FD_ZERO(&wfds);
+		FD_ZERO(&rfds);
+		FD_SET(sock, &rfds);
 		for (size_t index = 0; index < clients.size(); index++) {
-			FD_SET(clients[index]->connection_fd, &wfds);
-			FD_SET(clients[index]->connection_fd, &rfds);
-			if (clients[index]->connection_fd > max_fd)
-				max_fd = clients[index]->connection_fd;
+			FD_SET(clients[index]->fd, &wfds);
+			FD_SET(clients[index]->fd, &rfds);
+			if (clients[index]->fd > max_fd)
+				max_fd = clients[index]->fd;
 		}
 
-		slct(max_fd + 1, &rfds, NULL, NULL, NULL);
+		slct(max_fd + 1, &rfds, nullptr, nullptr, nullptr);
 		if (FD_ISSET(sock, &rfds)) {
 			acceptConnection();
 		}
 
 		for (size_t index = 0; index < clients.size(); index++) {
-			if (FD_ISSET(clients[index]->connection_fd, &rfds)) {
+			if (FD_ISSET(clients[index]->fd, &rfds)) {
 				receive(clients[index]);
 			}
-			if (FD_ISSET(clients[index]->connection_fd, &wfds)) {
+			if (FD_ISSET(clients[index]->fd, &wfds)) {
 				std::cout << "client is ready to receive info" << std::endl;
 				send(clients[index]);
-				// closeConnection(clients[index]);
+				clients.erase(clients.begin() + index);
 			}
 		}
-	}
+	} // while
 }
