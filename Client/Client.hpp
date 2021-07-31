@@ -20,5 +20,6 @@ struct Client {
 
     Client();
     void initClient();
-    void log();
 };
+
+std::ostream& operator<<(std::ostream& out, const Client & client);

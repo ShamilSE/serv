@@ -47,6 +47,7 @@ void Server::acceptConnection() {
 	}
 	fcntl(connection_fd, F_SETFL, O_NONBLOCK);
 
+	std::cout << "incoming connection from " << *client << std::endl;
 	client->fd = connection_fd;
 	clients.push_back(client);
 }
@@ -77,10 +78,19 @@ void Server::receive(Client* client) {
 		buf[bytes_read] = 0;
 		std::string str_buf(buf, bytes_read);
 		client->request = new Request(str_buf);
-		std::cout << "received " << bytes_read << " from client" << std::endl;
-		return;
 	}
-	printf("there could be error\n");
+	std::cout << "read() returned " << bytes_read << std::endl;
+	if (bytes_read == 0) {
+		close(client->fd);
+		for (size_t index = 0; index < clients.size(); index++) {
+			if (client == clients[index]) {
+				clients.erase(clients.begin() + index);
+				FD_ZERO(&wfds);
+				std::cout << "client " << *client << " disconnected" << std::endl;
+				return;
+			}
+		}
+	}
 }
 
 void Server::send(Client* client) {
@@ -114,9 +124,8 @@ void Server::listenSocket(int backlog) {
 				receive(clients[index]);
 			}
 			if (FD_ISSET(clients[index]->fd, &wfds)) {
-				std::cout << "client is ready to receive info" << std::endl;
+				std::cout << "send" << std::endl;
 				send(clients[index]);
-				clients.erase(clients.begin() + index);
 			}
 		}
 	} // while

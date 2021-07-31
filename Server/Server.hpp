@@ -33,11 +33,11 @@ private:
 	void lstn(int, int);
 	void slct(int max_fd, fd_set *wfds, fd_set *rfds, fd_set *err, timeval *t);
 	void initServer(int);
+	void receive(Client*);
+	void send(Client*);
 
 public:
 	Server(int, int, int);
 	void listenSocket(int);
-	void receive(Client*);
-	void send(Client*);
 };
 

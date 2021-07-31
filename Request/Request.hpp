@@ -13,4 +13,5 @@ struct Request {
 	std::map<std::string, std::string> headers;
 
 	Request(std::string);
+	void parseRequest(std::string);
 };

@@ -1,6 +1,6 @@
 #include "Request.hpp"
 
-Request::Request(std::string message) {
+void Request::parseRequest(std::string message) {
 	std::string tmp;
 	std::string key;
 	std::string value;
@@ -8,7 +8,6 @@ Request::Request(std::string message) {
 	method = message.substr(0, message.find(" "));
 	tmp = toNextSymbol(message, " ");
 	path = tmp.substr(0, tmp.find(" "));
-	std::cout << "request path '" << path << "'" << std::endl;
 	tmp = toNextSymbol(tmp, " ");
 	protocolV = tmp.substr(0, tmp.find("\r"));
 	tmp = toNextSymbol(tmp, "\n");
@@ -23,4 +22,9 @@ Request::Request(std::string message) {
 		tmp = toNextSymbol(tmp, "\n");
 		headers[key] = value;
 	}
+}
+
+Request::Request(std::string message) {
+	parseRequest(message);
+	std::cout << "request path '" << path << "'" << std::endl;
 }

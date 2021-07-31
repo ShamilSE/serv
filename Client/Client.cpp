@@ -1,12 +1,5 @@
 #include "Client.hpp"
 
-void Client::log() {
-	char client_ipv4_str[INET_ADDRSTRLEN];
-	inet_ntop(AF_INET, &addr.sin_addr, client_ipv4_str, INET_ADDRSTRLEN);
-	
-	std::cout << "incoming connection from " << client_ipv4_str << ":" << addr.sin_port << std::endl;
-}
-
 void Client::initClient() {
 	bzero(&addr, sizeof addr);
 	request = nullptr;
@@ -15,4 +8,13 @@ void Client::initClient() {
 
 Client::Client() {
 	initClient();
+}
+
+std::ostream& operator<<(std::ostream& out, const Client & client) {
+	char client_ipv4_str[INET_ADDRSTRLEN];
+	inet_ntop(AF_INET, &client.addr.sin_addr, client_ipv4_str, INET_ADDRSTRLEN);
+
+	out << client_ipv4_str << ":" << client.addr.sin_port;
+
+	return out;
 }
