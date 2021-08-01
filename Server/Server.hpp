@@ -19,8 +19,6 @@
 #include "../Response/Response.hpp"
 #include "../Client/Client.hpp"
 
-#define MAX_CLIENTS 10
-
 class Server {
 private:
 	fd_set wfds, rfds;
@@ -29,15 +27,15 @@ private:
 	int max_fd;
 	std::vector<Client*> clients;
 
-	void acceptConnection();
-	void lstn(int, int);
-	void slct(int max_fd, fd_set *wfds, fd_set *rfds, fd_set *err, timeval *t);
-	void initServer(int);
-	void receive(Client*);
-	void send(Client*);
+	void _acceptConnection();
+	void _lstn(int, int);
+	void _slct(int max_fd, fd_set *wfds, fd_set *rfds, fd_set *err, timeval *t);
+	void _getServerAddr();
+	void _receive(Client*);
+	void _send(Client*);
+	void _resetFDSet();
 
 public:
-	Server(int, int, int);
-	void listenSocket(int);
+	Server(int);
+	void listen(int);
 };
-

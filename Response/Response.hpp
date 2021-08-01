@@ -14,4 +14,7 @@ struct Response {
 	Response(Request*);
 	void send(int);
 	std::string routing(std::string path);
+	void setHeader(std::string, std::string);
+
+	std::string getHeaders();
 };
