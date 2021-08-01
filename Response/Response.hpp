@@ -10,9 +10,12 @@ struct Response {
 	std::string startingLine;
 	std::map<std::string, std::string> headers;
 	std::string body;
+	int client_fd;
 
 	Response(Request*);
-	void send(int);
+
+	void send();
+	void send(std::string);
 	std::string routing(std::string path);
 	void setHeader(std::string, std::string);
 

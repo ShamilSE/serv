@@ -34,6 +34,7 @@ std::string Response::routing(std::string path) {
 Response::Response(Request* request) {
 	startingLine = "HTTP/1.1 200 OK\n";
 	body = routing(request->path);
+	this->client_fd = request->client_fd;
 }
 
 std::string readFile(std::string filepath) {
@@ -47,16 +48,16 @@ std::string readFile(std::string filepath) {
 	return buf.str();
 }
 
-void Response::send(int connection_fd) {
-	// body = readFile(filepath)
+void Response::send(std::string filepath) {
+	body = readFile(filepath);
 	setHeader("Content-Length", std::to_string(body.size()));
 	setHeader("Connection", "Keep-Alive");
 	setHeader("Keep-Alive", "timeout=5, max=10");
-	std::string response = startingLine
-		+ getHeaders()
-		+ "\n"
-		+ body;
 
-	int bytes_sent = write(connection_fd, response.c_str(), response.size());
-	std::cout << "data sent (" << bytes_sent << ") bytes" << std::endl;
+	std::string response = startingLine + getHeaders() + "\n" + body;
+	int bytes_sent = write(client_fd, response.c_str(), response.size());
+	if (response.size() == bytes_sent)
+		std::cout << "all data sent" << std::endl;
+	else
+		std::cout << "part of data sent" << std::endl;
 }

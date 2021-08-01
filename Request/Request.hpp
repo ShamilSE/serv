@@ -7,11 +7,13 @@
 #include "../webserv.hpp"
 
 struct Request {
+	Request(std::string);
+
+	int client_fd;
 	std::string method;
 	std::string path;
 	std::string protocolV;
 	std::map<std::string, std::string> headers;
 
-	Request(std::string);
 	void parseRequest(std::string);
 };

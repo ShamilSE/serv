@@ -1,7 +1,16 @@
 #include "Server/Server.hpp"
 
-int main(void) {
-	Server server(5432);
+void routing(Request& request, Response& response) {
+	std::cout << "this is callback" << std::endl;
 
-	server.listen(3);
+	if (request.path == "/")
+		response.send("pages/index.html");
+	else
+		response.send("pages/404.html");
+}
+
+int main(void) {
+	Server server(routing);
+
+	server.listen(5432);
 }

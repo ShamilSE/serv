@@ -12,11 +12,14 @@
 #include <fcntl.h>
 #include <arpa/inet.h>
 #include "../Request/Request.hpp"
+#include "../Response/Response.hpp"
 
 struct Client {
     int fd;
-    Request *request;
     struct sockaddr_in addr;
+
+    Request* request;
+    Response* response;
 
     Client();
     void initClient();

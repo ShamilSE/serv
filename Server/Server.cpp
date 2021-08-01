@@ -1,8 +1,22 @@
 #include "Server.hpp"
 
-Server::Server(int port): port(port) {
-	_getServerAddr();
-	std::cout << "creating new socket..." << std::endl;
+Server::Server(void(*callback)(Request&, Response&)) {
+	this->callback = callback;
+}
+
+void Server::_getServerAddr(int port) {
+	this->port = port;
+	bzero(&server_addr, sizeof server_addr);
+	server_addr.sin_family = AF_INET;
+	server_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+	server_addr.sin_port = htons(port);
+	/* Set nonblock for stdin. */
+	int flag = fcntl(sock, F_GETFL, 0);
+	flag |= O_NONBLOCK;
+	fcntl(sock, F_SETFL, flag);
+}
+
+void Server::_createSocket() {
 	sock = socket(AF_INET, SOCK_STREAM, 0);
 	if (sock == -1) {
 		perror("sock");
@@ -13,23 +27,10 @@ Server::Server(int port): port(port) {
 		perror("setsockopt");
 		exit(1);
 	}
-	std::cout << "bind socket..." << std::endl;
 	if (-1 == bind(sock, (struct sockaddr*)&server_addr, sizeof server_addr)) {
 		perror("bind");
 		exit(1);
 	}
-	std::cout << "waiting for connection at port " << port << "..." << std::endl;
-}
-
-void Server::_getServerAddr() {
-	bzero(&server_addr, sizeof server_addr);
-	server_addr.sin_family = AF_INET;
-	server_addr.sin_addr.s_addr = htonl(INADDR_ANY);
-	server_addr.sin_port = htons(port);
-	/* Set nonblock for stdin. */
-	int flag = fcntl(sock, F_GETFL, 0);
-	flag |= O_NONBLOCK;
-	fcntl(sock, F_SETFL, flag);
 }
 
 void Server::_acceptConnection() {
@@ -51,11 +52,12 @@ void Server::_acceptConnection() {
 	clients.push_back(client);
 }
 
-void Server::_lstn(int sock, int backlog) {
-	if (-1 == ::listen(sock, backlog)) {
+void Server::_lstn(int sock) {
+	if (-1 == ::listen(sock, 3)) {
 		perror("listen");
 		exit(1);
 	}
+	std::cout << "server is listening for " << port << " port" << std::endl;
 }
 
 void Server::_slct(int max_fd, fd_set *rfds, fd_set *wfds, fd_set *err, timeval *t) {
@@ -90,6 +92,8 @@ void Server::_receive(Client* client) {
 		buf[bytes_read] = 0;
 		std::string str_buf(buf, bytes_read);
 		client->request = new Request(str_buf);
+		client->request->client_fd = client->fd;
+		client->response = new Response(client->request);
 	}
 	std::cout << "read() returned " << bytes_read << std::endl;
 	if (bytes_read == 0) {
@@ -108,11 +112,13 @@ void Server::_receive(Client* client) {
 void Server::_send(Client* client) {
 	Response response(client->request);
 
-	response.send(client->fd);
+	callback(*client->request, *client->response);
 }
 
-void Server::listen(int backlog) {
-	_lstn(sock, backlog);
+void Server::listen(int port) {
+	_getServerAddr(port);
+	_createSocket();
+	_lstn(sock);
 	
 	while (1) {
 		_resetFDSet();

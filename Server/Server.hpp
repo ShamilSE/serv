@@ -15,7 +15,7 @@
 #include <iostream>
 #include <cstring>
 #include <vector>
-#include "../SmartPointer.hpp"
+#include "../Request/Request.hpp"
 #include "../Response/Response.hpp"
 #include "../Client/Client.hpp"
 
@@ -26,16 +26,18 @@ private:
 	struct sockaddr_in server_addr;
 	int max_fd;
 	std::vector<Client*> clients;
+	void(*callback)(Request&, Response&);
 
 	void _acceptConnection();
-	void _lstn(int, int);
+	void _lstn(int);
 	void _slct(int max_fd, fd_set *wfds, fd_set *rfds, fd_set *err, timeval *t);
-	void _getServerAddr();
+	void _getServerAddr(int);
+	void _createSocket();
 	void _receive(Client*);
 	void _send(Client*);
 	void _resetFDSet();
 
 public:
-	Server(int);
+	Server(void(*callback)(Request&, Response&));
 	void listen(int);
 };
