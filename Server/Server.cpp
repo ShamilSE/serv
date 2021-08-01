@@ -10,10 +10,8 @@ void Server::_getServerAddr(int port) {
 	server_addr.sin_family = AF_INET;
 	server_addr.sin_addr.s_addr = htonl(INADDR_ANY);
 	server_addr.sin_port = htons(port);
-	/* Set nonblock for stdin. */
-	int flag = fcntl(sock, F_GETFL, 0);
-	flag |= O_NONBLOCK;
-	fcntl(sock, F_SETFL, flag);
+
+	fcntl(sock, F_SETFL, O_NONBLOCK);
 }
 
 void Server::_createSocket() {
@@ -71,7 +69,7 @@ void Server::_slct(int max_fd, fd_set *rfds, fd_set *wfds, fd_set *err, timeval 
 	}
 }
 
-void Server::_resetFDSet() {
+void Server::_setFDSet() {
 	max_fd = sock;
 	FD_ZERO(&wfds);
 	FD_ZERO(&rfds);
@@ -121,8 +119,10 @@ void Server::listen(int port) {
 	_lstn(sock);
 	
 	while (1) {
-		_resetFDSet();
+		_setFDSet();
 		_slct(max_fd + 1, &rfds, nullptr, nullptr, nullptr);
+		if (clients.size())
+			_slct(max_fd + 1, nullptr, &wfds, nullptr, nullptr);
 		if (FD_ISSET(sock, &rfds)) {
 			_acceptConnection();
 		}
@@ -131,7 +131,7 @@ void Server::listen(int port) {
 			if (FD_ISSET(clients[index]->fd, &rfds)) {
 				_receive(clients[index]);
 			}
-			if (FD_ISSET(clients[index]->fd, &wfds)) {
+			if (clients[index]->request != nullptr && FD_ISSET(clients[index]->fd, &wfds)) {
 				_send(clients[index]);
 			}
 		}

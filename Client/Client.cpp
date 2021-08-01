@@ -3,6 +3,7 @@
 void Client::initClient() {
 	bzero(&addr, sizeof addr);
 	request = nullptr;
+	response = nullptr;
 	fd = 0;
 }
 

@@ -35,7 +35,7 @@ private:
 	void _createSocket();
 	void _receive(Client*);
 	void _send(Client*);
-	void _resetFDSet();
+	void _setFDSet();
 
 public:
 	Server(void(*callback)(Request&, Response&));
