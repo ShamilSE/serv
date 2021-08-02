@@ -8,12 +8,15 @@ std::string Response::getHeaders() {
 	return s_headers;
 }
 
-Response::Response(Request* request): _client_fd(request->client_fd) {}
+Response::Response(Request* request):
+	_client_fd(request->client_fd),
+	_protocolV(request->protocolV)
+{}
 
 void Response::setHeader(std::string key, std::string value) {_headers[key] = value;}
 void Response::setStatus(std::string status) {_status = status;}
 
-std::string Response::getStartingLine() {return "HTTP/1.1 " + _status + "\n";}
+std::string Response::getStartingLine() {return _protocolV + " " + _status + "\n";}
 std::string Response::getStatus() {return _status;}
 std::string Response::getBody() {return _body;}
 
@@ -23,8 +26,14 @@ void Response::send(std::string filepath) {
 	setHeader("Connection", "Keep-Alive");
 	setHeader("Keep-Alive", "timeout=5, max=10");
 	setHeader("Status", getStatus());
+	setHeader("date", getCurrentUTCDate());
 
 	std::string response = getStartingLine() + getHeaders() + "\n" + getBody();
+
+	std::cout << "===============RESPONSE=================" << std::endl;
+	std::cout << response << std::endl;
+	std::cout << "========================================" << std::endl;
+
 	int bytes_sent = write(_client_fd, response.c_str(), response.size());
 
 	if (response.size() == bytes_sent)

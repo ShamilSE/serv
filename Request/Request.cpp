@@ -24,7 +24,9 @@ void Request::parseRequest(std::string message) {
 	}
 }
 
-Request::Request(std::string message) {
+Request::Request(std::string message): message(message) {
 	parseRequest(message);
-	std::cout << "requested path '" << path << "'" << std::endl;
+	std::cout << "===============REQUEST==================" << std::endl;
+	std::cout << message << std::endl;
+	std::cout << "========================================" << std::endl;
 }

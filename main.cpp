@@ -1,10 +1,11 @@
 #include "Server/Server.hpp"
 
 void routing(Request& request, Response& response) {
-	if (request.path == "/") {
-		response.setStatus("200 OK");
+	response.setStatus("200 OK");
+	if (request.path == "/")
 		response.send("pages/index.html");
-	}
+	else if (request.path == "/form")
+		response.send("pages/form.html");
 	else if (request.path == "/run_script")
 		std::cout << "run script" << std::endl;
 	else {

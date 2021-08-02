@@ -123,9 +123,8 @@ void Server::listen(int port) {
 		_slct(max_fd + 1, &rfds, nullptr, nullptr, nullptr);
 		if (clients.size())
 			_slct(max_fd + 1, nullptr, &wfds, nullptr, nullptr);
-		if (FD_ISSET(sock, &rfds)) {
+		if (FD_ISSET(sock, &rfds))
 			_acceptConnection();
-		}
 
 		for (size_t index = 0; index < clients.size(); index++) {
 			if (FD_ISSET(clients[index]->fd, &rfds)) {

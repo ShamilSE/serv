@@ -8,6 +8,7 @@
 
 struct Request {
 	Request(std::string);
+	std::string message;
 
 	int client_fd;
 	std::string method;

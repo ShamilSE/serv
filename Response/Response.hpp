@@ -1,13 +1,11 @@
 #pragma once
 
-#include "../Request/Request.hpp"
 #include "../webserv.hpp"
-#include <string>
-#include <map>
 
 class Response {
 private:
 	std::string _startingLine;
+	std::string _protocolV;
 	std::string _status;
 	std::map<std::string, std::string> _headers;
 	std::string _body;
