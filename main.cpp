@@ -6,8 +6,6 @@ void routing(Request& request, Response& response) {
 		response.send("pages/index.html");
 	else if (request.path == "/form")
 		response.send("pages/form.html");
-	else if (request.path == "/run_script")
-		std::cout << "run script" << std::endl;
 	else {
 		response.setStatus("404 Not Found");
 		response.send("pages/404.html");
