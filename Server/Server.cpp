@@ -1,14 +1,24 @@
 #include "Server.hpp"
 
-Server::Server(void(*callback)(Request&, Response&)) {
+Server::Server(void(*callback)(Request&, Response&), std::string config) {
+	_conf = new Configuration(config);
+	_getServerAddr();
 	this->callback = callback;
 }
 
-void Server::_getServerAddr(int port) {
-	this->port = port;
+// Server::Server(const Server& other) {*this = other;}
+
+// Server& Server::operator=(const Server& other) {
+
+// }
+
+Server::~Server() {}
+
+void Server::_getServerAddr() {
+	this->port = stoi(_conf->fields["port"]);
 	bzero(&server_addr, sizeof server_addr);
 	server_addr.sin_family = AF_INET;
-	server_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+	server_addr.sin_addr.s_addr = htonl(0);
 	server_addr.sin_port = htons(port);
 
 	fcntl(sock, F_SETFL, O_NONBLOCK);
@@ -118,8 +128,7 @@ void Server::_send(Client* client) {
 	client->response = nullptr;
 }
 
-void Server::listen(int port) {
-	_getServerAddr(port);
+void Server::listen() {
 	_createSocket();
 	_lstn(sock);
 	

@@ -18,6 +18,7 @@
 #include "../Request/Request.hpp"
 #include "../Response/Response.hpp"
 #include "../Client/Client.hpp"
+#include "../Configuration/Configuration.hpp"
 
 class Server {
 private:
@@ -27,17 +28,22 @@ private:
 	int max_fd;
 	std::vector<Client*> clients;
 	void(*callback)(Request&, Response&);
+	Configuration* _conf;
 
 	void _acceptConnection();
 	void _lstn(int);
 	void _slct(int max_fd, fd_set *wfds, fd_set *rfds, fd_set *err, timeval *t);
-	void _getServerAddr(int);
+	void _getServerAddr();
 	void _createSocket();
 	void _receive(Client*);
 	void _send(Client*);
 	void _setFDSet();
 
 public:
-	Server(void(*callback)(Request&, Response&));
-	void listen(int);
+	Server(void(*callback)(Request&, Response&), std::string);
+	// Server(const Server&);
+	// Server& operator=(const Server&);
+	~Server();
+
+	void listen();
 };

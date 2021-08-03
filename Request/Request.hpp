@@ -19,4 +19,5 @@ struct Request {
 	std::map<std::string, std::string> headers;
 
 	void parseRequest(std::string);
+	void initStartingLine(std::string starting_line);
 };

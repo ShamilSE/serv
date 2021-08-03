@@ -23,6 +23,5 @@ std::string getCurrentUTCDate() {
 	dt = asctime(gmtm);
 	std::string str_buf(dt);
 
-	std::cout << str_buf << std::endl;
 	return str_buf;
 }

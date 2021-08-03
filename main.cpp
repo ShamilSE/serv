@@ -1,4 +1,6 @@
 #include "Server/Server.hpp"
+#include "CGI/CGI.hpp"
+#include "webserv.hpp"
 
 void routing(Request& request, Response& response) {
 	response.setStatus("200 OK");
@@ -12,8 +14,23 @@ void routing(Request& request, Response& response) {
 	}
 }
 
-int main(void) {
-	Server server(routing);
+int main(int argc, char** argv, char** env) {
+	if (argc != 2) {
+		std::cout << "webserv: usage: " << "./webserv " << "[path_to_configuration]" << std::endl;
+		exit(1);
+	}
 
-	server.listen(5432);
+	std::string config(argv[1]);
+	std::vector<std::string> configurations = parseConfig(config);
+	std::vector<Server> servers;
+	servers.reserve(configurations.size());
+
+	for (size_t index = 0; index < configurations.size(); index++) {
+		Server server(routing, configurations[index]);
+		servers.push_back(server);
+	}
+	// for (size_t index = 0; index < servers.size(); index++) {
+	// 	servers[index].listen();
+	// }
+	servers[0].listen();
 }

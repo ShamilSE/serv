@@ -32,7 +32,11 @@ void Response::send(std::string filepath) {
 	setHeader("Status", getStatus());
 	setHeader("date", getCurrentUTCDate());
 
-	std::string response = getStartingLine() + getHeaders() + "\n" + getBody();
+	std::string response = 
+		getStartingLine()
+		+ getHeaders() 
+		+ "\n"
+		+ getBody();
 
 	std::cout << "===============RESPONSE=================" << std::endl;
 	std::cout << response << std::endl;
