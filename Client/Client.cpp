@@ -10,7 +10,6 @@ void Client::initClient() {
 Client::Client() {initClient();}
 
 Client::~Client() {
-	std::cout << "~Client()" << std::endl;
 	delete request;
 	delete response;
 }

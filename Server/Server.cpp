@@ -98,7 +98,6 @@ void Server::_receive(Client* client) {
 		close(client->fd);
 		for (size_t index = 0; index < clients.size(); index++) {
 			if (client == clients[index]) {
-				delete *(clients.begin() + index);
 				clients.erase(clients.begin() + index);
 				FD_ZERO(&wfds);
 				std::cout << "client " << *client << " disconnected" << std::endl;
@@ -112,6 +111,10 @@ void Server::_send(Client* client) {
 	Response response(client->request);
 
 	callback(*client->request, *client->response);
+	delete client->request;
+	delete client->response;
+	client->request = nullptr;
+	client->response = nullptr;
 }
 
 void Server::listen(int port) {
@@ -122,8 +125,6 @@ void Server::listen(int port) {
 	while (1) {
 		_setFDSet();
 		_slct(max_fd + 1, &rfds, nullptr, nullptr, nullptr);
-		if (clients.size())
-			_slct(max_fd + 1, nullptr, &wfds, nullptr, nullptr);
 		if (FD_ISSET(sock, &rfds))
 			_acceptConnection();
 
@@ -135,5 +136,5 @@ void Server::listen(int port) {
 				_send(clients[index]);
 			}
 		}
-	} // while
+	}
 }
