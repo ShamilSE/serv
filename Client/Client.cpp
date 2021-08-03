@@ -7,8 +7,12 @@ void Client::initClient() {
 	fd = 0;
 }
 
-Client::Client() {
-	initClient();
+Client::Client() {initClient();}
+
+Client::~Client() {
+	std::cout << "~Client()" << std::endl;
+	delete request;
+	delete response;
 }
 
 std::ostream& operator<<(std::ostream& out, const Client & client) {

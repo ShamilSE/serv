@@ -24,9 +24,13 @@ void Request::parseRequest(std::string message) {
 	}
 }
 
-Request::Request(std::string message): message(message) {
+Request::Request(std::string& message): message(message) {
 	parseRequest(message);
 	std::cout << "===============REQUEST==================" << std::endl;
 	std::cout << message << std::endl;
 	std::cout << "========================================" << std::endl;
+}
+
+Request::~Request() {
+	headers.clear();
 }

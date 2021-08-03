@@ -13,6 +13,10 @@ Response::Response(Request* request):
 	_protocolV(request->protocolV)
 {}
 
+Response::~Response() {
+	_headers.clear();
+}
+
 void Response::setHeader(std::string key, std::string value) {_headers[key] = value;}
 void Response::setStatus(std::string status) {_status = status;}
 

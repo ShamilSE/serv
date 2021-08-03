@@ -22,6 +22,8 @@ struct Client {
     Response* response;
 
     Client();
+    ~Client();
+
     void initClient();
 };
 

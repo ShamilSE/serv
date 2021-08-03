@@ -13,6 +13,7 @@ private:
 
 public:
 	Response(Request*);
+	~Response();
 
 	void send(std::string);
 

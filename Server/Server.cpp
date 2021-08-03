@@ -98,6 +98,7 @@ void Server::_receive(Client* client) {
 		close(client->fd);
 		for (size_t index = 0; index < clients.size(); index++) {
 			if (client == clients[index]) {
+				delete *(clients.begin() + index);
 				clients.erase(clients.begin() + index);
 				FD_ZERO(&wfds);
 				std::cout << "client " << *client << " disconnected" << std::endl;

@@ -7,7 +7,9 @@
 #include "../webserv.hpp"
 
 struct Request {
-	Request(std::string);
+	Request(std::string&);
+	~Request();
+
 	std::string message;
 
 	int client_fd;
