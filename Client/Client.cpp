@@ -1,6 +1,7 @@
 #include "Client.hpp"
 
 void Client::initClient() {
+	isWaitingForResponse = 0;
 	bzero(&addr, sizeof addr);
 	request = nullptr;
 	response = nullptr;

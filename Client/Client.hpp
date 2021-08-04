@@ -17,6 +17,7 @@
 struct Client {
     int fd;
     struct sockaddr_in addr;
+    int isWaitingForResponse;
 
     Request* request;
     Response* response;

@@ -61,6 +61,7 @@ void _receive(Client* client) {
 		client->request = new Request(str_buf);
 		client->request->client_fd = client->fd;
 		client->response = new Response(client->request);
+		client->isWaitingForResponse = 1;
 	}
 	std::cout << "read() returned " << bytes_read << std::endl;
 	if (bytes_read == 0) {
@@ -81,6 +82,7 @@ void _receive(Client* client) {
 
 void _send(Client* client) {
 	mainClass->routing(*client->request, *client->response);
+	client->isWaitingForResponse = 0;
 	// delete client->request;
 	// delete client->response;
 }
@@ -110,7 +112,8 @@ int main(int argc, char** argv, char** env) {
 				if (FD_ISSET(mainClass->servers[i].clients[ii]->fd, &mainClass->rfds)) {
 					_receive(mainClass->servers[i].clients[ii]);
 				}
-				if (mainClass->servers[i].clients[ii]->request != nullptr && FD_ISSET(mainClass->servers[i].clients[ii]->fd, &mainClass->wfds)) {
+				if (mainClass->servers[i].clients[ii]->isWaitingForResponse &&
+					mainClass->servers[i].clients[ii]->request != nullptr && FD_ISSET(mainClass->servers[i].clients[ii]->fd, &mainClass->wfds)) {
 					_send(mainClass->servers[i].clients[ii]);
 				}
 			}
