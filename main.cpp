@@ -1,22 +1,8 @@
 #include "Server/Server.hpp"
-#include "CGI/CGI.hpp"
-#include "webserv.hpp"
+#include "Main/Main.hpp"
+#include "Server/Server.hpp"
 
-void routing(Request& request, Response& response) {
-	response.setStatus("200 OK");
-	if (request.path == "/")
-		response.send("pages/index.html");
-	else if (request.path == "/form")
-		response.send("pages/form.html");
-	else {
-		response.setStatus("404 Not Found");
-		response.send("pages/404.html");
-	}
-}
-
-
-std::vector<Server> getConfiguredServers(std::string);
-std::vector<Server> servers = getConfiguredServers("conf/webserv2.conf");
+Main* mainClass = Main::Instance();
 
 void checkArgs(int argc, char** argv) {
 	if (argc != 2) {
@@ -25,21 +11,18 @@ void checkArgs(int argc, char** argv) {
 	}
 }
 
-fd_set wfds, rfds;
-int max_fd = 0;
-
 void _setFDSet(Server& server) {
-	FD_SET(server.getSock(), &rfds);
+	FD_SET(server.getSock(), &mainClass->rfds);
 	for (size_t ii = 0; ii < server.clients.size(); ii++) {
-		FD_SET(server.clients[ii]->fd, &wfds);
-		FD_SET(server.clients[ii]->fd, &rfds);
-		if (server.clients[ii]->fd > max_fd)
-			max_fd = server.clients[ii]->fd;
+		FD_SET(server.clients[ii]->fd, &mainClass->wfds);
+		FD_SET(server.clients[ii]->fd, &mainClass->rfds);
+		if (server.clients[ii]->fd > mainClass->max_fd)
+			mainClass->max_fd = server.clients[ii]->fd;
 	}
 }
 
 void _slct(int max_fd, fd_set *rfds, fd_set *wfds, fd_set *err, timeval *t) {
-	if (-1 == (select(max_fd + 1, rfds, wfds, err, t))) {
+	if (-1 == (select(mainClass->max_fd + 1, rfds, wfds, err, t))) {
 		if (errno != EINTR) {
 			perror("select");
 			exit(1);
@@ -82,12 +65,12 @@ void _receive(Client* client) {
 	std::cout << "read() returned " << bytes_read << std::endl;
 	if (bytes_read == 0) {
 		close(client->fd);
-		for (size_t i = 0; i < servers.size(); i++) {
-			for (size_t ii = 0; ii < servers[i].clients.size(); ii++) {
-				if (client == servers[i].clients[ii]) {
-					delete *(servers[i].clients.begin() + ii);
-					servers[i].clients.erase(servers[i].clients.begin() + ii);
-					FD_ZERO(&wfds);
+		for (size_t i = 0; i < mainClass->servers.size(); i++) {
+			for (size_t ii = 0; ii < mainClass->servers[i].clients.size(); ii++) {
+				if (client == mainClass->servers[i].clients[ii]) {
+					delete *(mainClass->servers[i].clients.begin() + ii);
+					mainClass->servers[i].clients.erase(mainClass->servers[i].clients.begin() + ii);
+					FD_ZERO(&mainClass->wfds);
 					std::cout << "client " << *client << " disconnected" << std::endl;
 					return;
 				}
@@ -97,48 +80,38 @@ void _receive(Client* client) {
 }
 
 void _send(Client* client) {
-	routing(*client->request, *client->response);
+	mainClass->routing(*client->request, *client->response);
 	// delete client->request;
 	// delete client->response;
-}
-
-std::vector<Server> getConfiguredServers(std::string config) {
-	std::vector<std::string> configurations = parseConfig(config);
-	std::vector<Server> servers;
-	servers.reserve(configurations.size());
-
-	for (size_t index = 0; index < configurations.size(); index++) {
-		Server server(routing, configurations[index]);
-		servers.push_back(server);
-	}
-	return servers;
 }
 
 int main(int argc, char** argv, char** env) {
 	checkArgs(argc, argv);
 
-	max_fd = servers[servers.size() - 1].getSock();
+	mainClass->servers = mainClass->getConfiguredServers("conf/webserv2.conf");
+	
+	mainClass->max_fd = mainClass->servers[mainClass->servers.size() - 1].getSock();
 	while (1) {
-		FD_ZERO(&wfds);
-		FD_ZERO(&rfds);
-		for (size_t index = 0; index < servers.size(); index++) {
-			_setFDSet(servers[index]);
+		FD_ZERO(&mainClass->wfds);
+		FD_ZERO(&mainClass->rfds);
+		for (size_t index = 0; index < mainClass->servers.size(); index++) {
+			_setFDSet(mainClass->servers[index]);
 		}
 
-		_slct(max_fd + 1, &rfds, nullptr, nullptr, nullptr);
+		_slct(mainClass->max_fd + 1, &mainClass->rfds, nullptr, nullptr, nullptr);
 
-		for (size_t index = 0; index < servers.size(); index++) {
-			if (FD_ISSET(servers[index].getSock(), &rfds))
-				_acceptConnection(servers[index]);
+		for (size_t index = 0; index < mainClass->servers.size(); index++) {
+			if (FD_ISSET(mainClass->servers[index].getSock(), &mainClass->rfds))
+				_acceptConnection(mainClass->servers[index]);
 		}
 
-		for (size_t i = 0; i < servers.size(); i++) {
-			for (size_t ii = 0; ii < servers[i].clients.size(); ii++) {
-				if (FD_ISSET(servers[i].clients[ii]->fd, &rfds)) {
-					_receive(servers[i].clients[ii]);
+		for (size_t i = 0; i < mainClass->servers.size(); i++) {
+			for (size_t ii = 0; ii < mainClass->servers[i].clients.size(); ii++) {
+				if (FD_ISSET(mainClass->servers[i].clients[ii]->fd, &mainClass->rfds)) {
+					_receive(mainClass->servers[i].clients[ii]);
 				}
-				if (servers[i].clients[ii]->request != nullptr && FD_ISSET(servers[i].clients[ii]->fd, &wfds)) {
-					_send(servers[i].clients[ii]);
+				if (mainClass->servers[i].clients[ii]->request != nullptr && FD_ISSET(mainClass->servers[i].clients[ii]->fd, &mainClass->wfds)) {
+					_send(mainClass->servers[i].clients[ii]);
 				}
 			}
 		}

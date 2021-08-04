@@ -1,9 +1,8 @@
 #include "Server.hpp"
 
-Server::Server(void(*callback)(Request&, Response&), std::string config) {
+Server::Server(std::string config) {
 	_conf = new Configuration(config);
 	_getServerAddr();
-	callback = callback;
 
 	_createSocket();
 	_lstn(sock);

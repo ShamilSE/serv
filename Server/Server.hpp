@@ -25,21 +25,14 @@ private:
 	int sock;
 	int port;
 	struct sockaddr_in server_addr;
-	int max_fd;
-	void(*callback)(Request&, Response&);
 	Configuration* _conf;
-
-
-
 
 	void _getServerAddr();
 	void _createSocket();
-
-
 	void _lstn(int sock);
 
 public:
-	Server(void(*callback)(Request&, Response&), std::string);
+	Server(std::string);
 	// Server(const Server&);
 	// Server& operator=(const Server&);
 	~Server();
