@@ -24,3 +24,12 @@ Request::Request(std::string& message): message(message) {
 Request::~Request() {
 	headers.clear();
 }
+
+void Request::setClientFD(int fd) {this->client_fd = fd;}
+
+std::string Request::getMethod() const {return method;}
+std::string Request::getPath() const {return path;}
+std::string Request::getProtocolV() const {return protocolV;}
+
+std::string Request::getMessage() const {return message;}
+int Request::getClientFD() const {return client_fd;}

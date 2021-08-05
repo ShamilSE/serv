@@ -1,7 +1,7 @@
 NAME = webserv
 SRC = main.cpp Server/Server.cpp Client/Client.cpp\
 	Request/Request.cpp Response/Response.cpp\
-	Main/Main.cpp\
+	Main/Main.cpp CGI/CGI.cpp\
 	Configuration/Configuration.cpp\
 	utils/parser.cpp utils/other.cpp\
 	utils/strToMap.cpp\

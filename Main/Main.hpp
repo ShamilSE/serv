@@ -3,6 +3,8 @@
 #include "../Server/Server.hpp"
 #include "../Request/Request.hpp"
 #include "../Response/Response.hpp"
+#include "../Client/Client.hpp"
+#include "../CGI/CGI.hpp"
 
 class Main {
 public:
@@ -12,13 +14,18 @@ public:
 
     static Main* Instance();
 
-    std::vector<Server> getConfiguredServers(std::string);
-
+    void configureServers(std::string);
     void routing(Request&, Response&);
+    void setFDSet(Server&);
+    void slct(int, fd_set*, fd_set*, fd_set*, timeval*);
+    void acceptConnection(Server&);
+    void receive(Client*);
+    void send(Client*);
+    void cycle();
 
-private:        
+private:
     Main(){}
-    Main(const Main& root) = delete;
-    Main& operator=(const Main&) = delete;
+    Main(const Main& root);
+    Main& operator=(const Main&);
 
 };

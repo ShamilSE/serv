@@ -8,6 +8,7 @@ std::string readFile(std::string filepath) {
 	if (!in)
 		throw std::runtime_error("file can't be opened");
 	buf << in.rdbuf();
+	in.close();
 	return buf.str();
 }
 

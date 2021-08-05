@@ -1,7 +1,7 @@
 #include "Client.hpp"
 
 void Client::initClient() {
-	isWaitingForResponse = 0;
+	// isWaitingForResponse = 0;
 	bzero(&addr, sizeof addr);
 	request = nullptr;
 	response = nullptr;
@@ -23,3 +23,6 @@ std::ostream& operator<<(std::ostream& out, const Client & client) {
 
 	return out;
 }
+
+void Client::setRequest(Request* request) {this->request = request;}
+void Client::setResponse(Response* response) {this->response = response;}

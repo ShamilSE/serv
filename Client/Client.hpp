@@ -14,18 +14,26 @@
 #include "../Request/Request.hpp"
 #include "../Response/Response.hpp"
 
-struct Client {
+class Client {
+public:
     int fd;
-    struct sockaddr_in addr;
-    int isWaitingForResponse;
 
     Request* request;
     Response* response;
+
+public:
+    struct sockaddr_in addr;
 
     Client();
     ~Client();
 
     void initClient();
+
+    int getFD();
+
+
+    void setRequest(Request*);
+    void setResponse(Response*);
 };
 
 std::ostream& operator<<(std::ostream& out, const Client & client);
