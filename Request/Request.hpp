@@ -23,11 +23,12 @@ public:
 	void initStartingLine(std::string starting_line);
 
 	void setClientFD(int);
+	void initHeaders(std::string);
 
 	std::string getMethod() const;
 	std::string getPath() const;
 	std::string getProtocolV() const;
-	std::string getHeaderByKey(std::string) const;
+	std::string getHeaderByKey(std::string);
 	std::string getMessage() const;
 	int getClientFD() const;
 };

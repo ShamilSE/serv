@@ -19,3 +19,4 @@ std::map<std::string, std::string> strToMap(std::string src, std::string delimet
 std::map<std::string, std::string> strToMap(std::string src, std::string delimeter, std::string eos);
 std::vector<std::string> split(std::string src, std::string delimeter);
 std::vector<std::string> parseConfig(std::string filename);
+char** mapToCharArray(std::map<std::string, std::string> map);

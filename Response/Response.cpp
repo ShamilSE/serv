@@ -38,9 +38,9 @@ void Response::send(std::string filepath) {
 		+ "\n"
 		+ getBody();
 
-	std::cout << "===============RESPONSE=================" << std::endl;
-	std::cout << response << std::endl;
-	std::cout << "========================================" << std::endl;
+	// std::cout << "===============RESPONSE=================" << std::endl;
+	// std::cout << response << std::endl;
+	// std::cout << "========================================" << std::endl;
 
 	int bytes_sent = write(_client_fd, response.c_str(), response.size());
 

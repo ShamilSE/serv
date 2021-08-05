@@ -101,7 +101,6 @@ void Main::routing(Request& request, Response& response) {
 		else if (request.method == "POST") {
 			CGI cgi(request);
 			cgi.execute();
-
 		}
 	}
 	else {

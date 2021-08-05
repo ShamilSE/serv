@@ -32,3 +32,14 @@ std::vector<std::string> parseConfig(std::string filename) {
 	}
 	return configurations;
 }
+
+char** mapToCharArray(std::map<std::string, std::string> map) {
+	char** array = (char**)malloc(map.size() + 1);
+
+	std::map<std::string, std::string>::iterator it = map.begin();
+	for (size_t index = 0; index < map.size(); index++, it++) {
+		array[index] = strdup((it->first + ": " + it->second).c_str());
+	}
+	array[map.size()] = NULL;
+	return array;
+}
