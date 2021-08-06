@@ -5,10 +5,8 @@ std::map<std::string, std::string> strToMap(std::string src, std::string delimet
 	std::string key;
 	std::string value;
 
- 	while (1) {
+ 	while (src.find(delimeter) != std::string::npos) {
 		key = src.substr(0, src.find(delimeter));
-		if (src.find(delimeter) == std::string::npos)
-			break;
 		src = toNextSymbol(src, delimeter);
 		value = src.substr(0, src.find("\n"));
 		src = toNextSymbol(src, "\n");

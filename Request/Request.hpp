@@ -7,7 +7,7 @@
 #include "../webserv.hpp"
 
 class Request {
-public:
+private:
 	std::string message;
 	int client_fd;
 	std::string method;
@@ -31,4 +31,6 @@ public:
 	std::string getHeaderByKey(std::string);
 	std::string getMessage() const;
 	int getClientFD() const;
+	std::string getClientServerName();
+	std::string getClientServerPort();
 };

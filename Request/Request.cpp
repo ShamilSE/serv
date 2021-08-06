@@ -31,9 +31,9 @@ void Request::parseRequest(std::string message) {
 
 Request::Request(std::string& message): message(message) {
 	parseRequest(message);
-	// std::cout << "===============REQUEST==================" << std::endl;
-	// std::cout << message << std::endl;
-	// std::cout << "========================================" << std::endl;
+	std::cout << "===============REQUEST==================" << std::endl;
+	std::cout << message << std::endl;
+	std::cout << "========================================" << std::endl;
 }
 
 Request::~Request() {
@@ -48,3 +48,5 @@ std::string Request::getProtocolV() const {return protocolV;}
 std::string Request::getHeaderByKey(std::string key) {return headers[key];}
 std::string Request::getMessage() const {return message;}
 int Request::getClientFD() const {return client_fd;}
+std::string Request::getClientServerName() {return getHeaderByKey("Host").substr(0, getHeaderByKey("Host").find(":"));}
+std::string Request::getClientServerPort() {return getHeaderByKey("Host").substr(getHeaderByKey("Host").find(":") + 1, getHeaderByKey("Host").size());}

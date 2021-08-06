@@ -38,5 +38,6 @@ public:
 	~Server();
 
 	int getSock();
+	Configuration* getConfig();
 	std::vector<Client*> clients;
 };

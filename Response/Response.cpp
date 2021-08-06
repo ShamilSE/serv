@@ -9,8 +9,8 @@ std::string Response::getHeaders() {
 }
 
 Response::Response(Request* request):
-	_client_fd(request->client_fd),
-	_protocolV(request->protocolV)
+	_client_fd(request->getClientFD()),
+	_protocolV(request->getProtocolV())
 {}
 
 Response::~Response() {

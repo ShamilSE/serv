@@ -1,37 +1,34 @@
 #include "CGI.hpp"
 
-CGI::CGI(Request& request): request(request) {
-    setEnv();
-    _char_env = mapToCharArray(_env);
+CGI::CGI(Request& request, Configuration* config): request(request), serverConfiguration(config) {
+    initEnv();
+    _char_env = mapToCharArray(_env, "=");
 }
 
-void CGI::setEnv() {
-    // this->_env["REDIRECT_STATUS"] = "200"; //Security needed to execute php-cgi
-	// this->_env["GATEWAY_INTERFACE"] = "CGI/1.1";
+void CGI::setEnv(std::string key, std::string value) {_env[key] = value;}
+
+void CGI::initEnv() {
+	setEnv("GATEWAY_INTERFACE", "CGI/1.1");
 	// this->_env["SCRIPT_NAME"] = config.getPath();
-	// this->_env["SCRIPT_FILENAME"] = config.getPath();
-	this->_env["REQUEST_METHOD"] = request.getMethod();
-	this->_env["CONTENT_LENGTH"] = request.getHeaderByKey("Content-Length");
-	this->_env["CONTENT_TYPE"] = request.headers["Content-Type"];
+	// this->_env["SCRIPT_FILENAME"] = config.getScriptPath();
+	setEnv("REQUEST_METHOD", request.getMethod());
+	setEnv("CONTENT_LENGTH", request.getHeaderByKey("Content-Length"));
+	setEnv("CONTENT_TYPE", request.getHeaderByKey("Content-Type"));
 	// this->_env["PATH_INFO"] = request.getPath(); //might need some change, using config path/contentLocation
 	// this->_env["PATH_TRANSLATED"] = request.getPath(); //might need some change, using config path/contentLocation
-	this->_env["QUERY_STRING"] = request.getPath();
+	setEnv("QUERY_STRING", request.getPath());
 	// this->_env["REMOTEaddr"] = to_string(config.getHostPort().host);
-    this->_env["SERVER_NAME"] = request.getHeaderByKey("Host").substr(1, request.getHeaderByKey("Host").find(":"));
-	// if (headers.find("Hostname") != headers.end())
-	// 	this->_env["SERVER_NAME"] = headers["Hostname"];
-	// else
-		// this->_env["SERVER_NAME"] = this->_env["REMOTEaddr"];
-	// this->_env["SERVER_PORT"] = to_string(config.getHostPort().port);
-	this->_env["SERVER_PROTOCOL"] = request.getProtocolV();
-	this->_env["SERVER_SOFTWARE"] = "webserv";
-
+    setEnv("SERVER_NAME", request.getClientServerName());
+	setEnv("SERVER_PORT", request.getClientServerPort());
+	setEnv("SERVER_PROTOCOL", request.getProtocolV());
+	setEnv("SERVER_SOFTWARE", "webserv");
 }
 
 void CGI::freeCharEnv() {
-    for (size_t index = 0; _char_env[index]; index++)
-        free(_char_env[index]);
-    free(_char_env);
+    for (size_t index = 0; _char_env[index]; index++) {
+        delete (_char_env[index]);
+    }
+    delete [] (_char_env);
 }
 
 void CGI::execute() {
@@ -43,10 +40,10 @@ void CGI::execute() {
         exit(1);
     }
 
-    if (dup2(_fd, STDERR_FILENO) == -1) {
-        perror("dup2(1)");
-        exit(1);
-    }
+    // if (dup2(_fd, STDERR_FILENO) == -1) {
+    //     perror("dup2(1)");
+    //     exit(1);
+    // }
 
     int child, status;
     if ((child = fork()) == -1) {

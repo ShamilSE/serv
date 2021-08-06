@@ -15,13 +15,14 @@ public:
     static Main* Instance();
 
     void configureServers(std::string);
-    void routing(Request&, Response&);
+    void routing(Request&, Response&, Configuration*);
     void setFDSet(Server&);
     void slct(int, fd_set*, fd_set*, fd_set*, timeval*);
     void acceptConnection(Server&);
     void receive(Client*);
-    void send(Client*);
+    void send(Client*, Configuration*);
     void cycle();
+    std::vector<std::string> parseConfig(std::string);
 
 private:
     Main(){}

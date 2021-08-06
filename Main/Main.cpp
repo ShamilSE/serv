@@ -5,6 +5,27 @@ Main* Main::Instance() {
     return main;
 }
 
+std::vector<std::string> Main::parseConfig(std::string filename) {
+	std::string configContent;
+	try {
+		configContent = readFile(filename);
+	}
+	catch (std::runtime_error & e) {
+		std::cerr << e.what() << std::endl;
+		exit(1);
+	}
+
+	std::vector<std::string> configurations;
+	while (1) {
+		if (configContent.find("}") == std::string::npos)
+			break;
+		configContent = toNextSymbol(configContent, "\n", 7);
+		configurations.push_back(configContent.substr(0, configContent.find("}")));
+		configContent = toNextSymbol(configContent, "}", 0);
+	}
+	return configurations;
+}
+
 void Main::configureServers(std::string config) {
     std::vector<std::string> configurations = parseConfig(config);
 	servers.reserve(configurations.size());
@@ -83,23 +104,23 @@ void Main::receive(Client* client) {
 	}
 }
 
-void Main::send(Client* client) {
-	routing(*client->request, *client->response);
+void Main::send(Client* client, Configuration* serverConfig) {
+	routing(*client->request, *client->response, serverConfig);
 	delete client->request;
 	delete client->response;
 	client->request = nullptr;
 	client->response = nullptr;
 }
 
-void Main::routing(Request& request, Response& response) {
+void Main::routing(Request& request, Response& response, Configuration* serverConfig) {
 	response.setStatus("200 OK");
-	if (request.path == "/")
+	if (request.getPath() == "/")
 		response.send("pages/index.html");
-	else if (request.path == "/form") {
-		if (request.method == "GET")
+	else if (request.getPath() == "/form") {
+		if (request.getMethod() == "GET")
 			response.send("pages/form.html");
-		else if (request.method == "POST") {
-			CGI cgi(request);
+		else if (request.getMethod() == "POST") {
+			CGI cgi(request, serverConfig);
 			cgi.execute();
 		}
 	}
@@ -131,7 +152,7 @@ void Main::cycle() {
 					receive(servers[i].clients[ii]);
 				}
 				if (servers[i].clients[ii]->request != nullptr && FD_ISSET(servers[i].clients[ii]->fd, &wfds)) {
-					send(servers[i].clients[ii]);
+					send(servers[i].clients[ii], servers[i].getConfig());
 				}
 			}
 		}

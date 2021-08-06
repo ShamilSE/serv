@@ -52,3 +52,4 @@ void Server::_createSocket() {
 }
 
 int Server::getSock() {return sock;}
+Configuration* Server::getConfig() {return _conf;}
