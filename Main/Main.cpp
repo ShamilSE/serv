@@ -121,7 +121,9 @@ void Main::routing(Request& request, Response& response, Configuration* serverCo
 			response.send("pages/form.html");
 		else if (request.getMethod() == "POST") {
 			CGI cgi(request, serverConfig);
-			cgi.execute();
+			if (cgi.execute("CGI/formHandler"))
+				response.setStatus("201");
+			// response.send();
 		}
 	}
 	else {

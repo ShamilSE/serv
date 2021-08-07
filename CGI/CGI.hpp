@@ -24,5 +24,5 @@ public:
 
     CGI(Request&, Configuration*);
     void setEnv(std::string, std::string);
-    void execute();
+    int execute(std::string);
 };

@@ -31,7 +31,7 @@ void CGI::freeCharEnv() {
     delete [] (_char_env);
 }
 
-void CGI::execute() {
+int CGI::execute(std::string binpath) {
     // 1 fd is to std out
     // 0 fd is to std in
     int save_stdout = dup(1);
@@ -52,11 +52,10 @@ void CGI::execute() {
     }
     else if (child == 0) {
         // child proccess
-        if (execve("helloworld", NULL, _char_env) == -1) {
+        if (execve(binpath.c_str(), NULL, _char_env) == -1) {
             perror("execve");
             exit(1);
         }
-        std::cout << "execve" << std::endl;
     }
     // parent proccess
     waitpid(child, &status, 0);
@@ -65,4 +64,5 @@ void CGI::execute() {
         exit(1);
     }
     freeCharEnv();
+    return 1;
 }
