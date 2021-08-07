@@ -29,8 +29,10 @@ std::string getCurrentUTCDate() {
 
 size_t count_substrs(std::string src, std::string substr) {
 	size_t counter = 0;
-	while (src.find(substr) != std::string::npos) {
+	while (1) {
 		counter++;
+		if (src.find(substr, substr.size()) == std::string::npos)
+			break;
 		src = src.substr(src.find(substr, substr.size()));
 	}
 	return counter;
