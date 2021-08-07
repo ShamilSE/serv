@@ -6,16 +6,22 @@ bool Configuration::validateRequiredFields() {
     return false;
 }
 
-// void Configuration::parseLocations(std::string loc) {
-//     if (count_substrs(loc, "location") > 1)
-//         current
-//     while (std::string::npos != loc.find("location")) {
-//         locations.push_back(strToMap(loc, " "));
-//         if (std::string::npos == loc.find("location", 10))
-//             break;
-//         loc = loc.substr(loc.find("location", 8));
-//     }
-// }
+void Configuration::parseLocations(std::string loc) {
+    std::string currentLocation;
+    std::string target = "location";
+    size_t string_current_position = 0;
+    if (count_substrs(loc, target) > 1)
+        currentLocation = loc.substr(0, loc.find(target, target.size()));
+    else
+        currentLocation = loc;
+    while (1) {
+        locations.push_back(strToMap(currentLocation, " "));
+        string_current_position += currentLocation.size();
+        if (loc.find(target, string_current_position) == std::string::npos)
+            break;
+        currentLocation = loc.substr(loc.find(target, string_current_position));
+    }
+}
 
 void Configuration::parseConfig(std::string configContent) {
     if (configContent.find("location") == std::string::npos) {
