@@ -126,6 +126,9 @@ void Main::routing(Request& request, Response& response, Configuration* serverCo
 			// response.send();
 		}
 	}
+	else if (request.getPath() == "/uploading") {
+		response.send("pages/uploading.html");
+	}
 	else {
 		response.setStatus("404 Not Found");
 		response.send("pages/404.html");
