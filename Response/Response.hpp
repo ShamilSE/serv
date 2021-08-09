@@ -16,6 +16,7 @@ public:
 	~Response();
 
 	void send(std::string);
+	void send();
 
 	void setHeader(std::string, std::string);
 	void setStatus(std::string);

@@ -120,10 +120,10 @@ void Main::routing(Request& request, Response& response, Configuration* serverCo
 		if (request.getMethod() == "GET")
 			response.send("pages/form.html");
 		else if (request.getMethod() == "POST") {
+			response.setStatus("201 Created");
+			response.send();
 			CGI cgi(request, serverConfig);
-			if (cgi.execute("CGI/formHandler"))
-				response.setStatus("201");
-			// response.send();
+			cgi.execute("CGI/formHandler");
 		}
 	}
 	else if (request.getPath() == "/uploading") {

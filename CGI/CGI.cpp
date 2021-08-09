@@ -1,6 +1,11 @@
 #include "CGI.hpp"
 
-CGI::CGI(Request& request, Configuration* config): request(request), serverConfiguration(config) {
+CGI::CGI(Request& request, Configuration* config)
+: 
+    request(request),
+    serverConfiguration(config),
+    _fd(request.getClientFD())
+{
     initEnv();
     _char_env = mapToCharArray(_env, "=");
 }
@@ -11,17 +16,17 @@ void CGI::initEnv() {
 	setEnv("GATEWAY_INTERFACE", "CGI/1.1");
 	// this->_env["SCRIPT_NAME"] = config.getPath();
 	// this->_env["SCRIPT_FILENAME"] = config.getScriptPath();
-	setEnv("REQUEST_METHOD", request.getMethod());
-	setEnv("CONTENT_LENGTH", request.getHeaderByKey("Content-Length"));
-	setEnv("CONTENT_TYPE", request.getHeaderByKey("Content-Type"));
+	setEnv("REQUEST_METHOD", "\"" + request.getMethod() + "\"");
+	setEnv("CONTENT_LENGTH", "\"" + request.getHeaderByKey("Content-Length") + "\"");
+	setEnv("CONTENT_TYPE", "\"" + request.getHeaderByKey("Content-Type") + "\"");
 	// this->_env["PATH_INFO"] = request.getPath(); //might need some change, using config path/contentLocation
 	// this->_env["PATH_TRANSLATED"] = request.getPath(); //might need some change, using config path/contentLocation
-	setEnv("QUERY_STRING", request.getPath());
+	setEnv("QUERY_STRING", "\"" + request.getPath() + "\"");
 	// this->_env["REMOTEaddr"] = to_string(config.getHostPort().host);
-    setEnv("SERVER_NAME", request.getClientServerName());
-	setEnv("SERVER_PORT", request.getClientServerPort());
-	setEnv("SERVER_PROTOCOL", request.getProtocolV());
-	setEnv("SERVER_SOFTWARE", "webserv");
+    setEnv("SERVER_NAME", "\"" + request.getClientServerName() + "\"");
+	setEnv("SERVER_PORT", "\"" + request.getClientServerPort() + "\"");
+	setEnv("SERVER_PROTOCOL", "\"" + request.getProtocolV() + "\"");
+	setEnv("SERVER_SOFTWARE", "\"webserv\"");
 }
 
 void CGI::freeCharEnv() {
@@ -40,17 +45,16 @@ int CGI::execute(std::string binpath) {
         exit(1);
     }
 
-    // if (dup2(_fd, STDERR_FILENO) == -1) {
-    //     perror("dup2(1)");
-    //     exit(1);
-    // }
-
     int child, status;
     if ((child = fork()) == -1) {
         perror("fork");
         exit(1);
     }
     else if (child == 0) {
+        if (dup2(_fd, STDOUT_FILENO) == -1) {
+            perror("dup2(1)");
+            exit(1);
+        }
         // child proccess
         if (execve(binpath.c_str(), NULL, _char_env) == -1) {
             perror("execve");
@@ -59,10 +63,6 @@ int CGI::execute(std::string binpath) {
     }
     // parent proccess
     waitpid(child, &status, 0);
-    if (dup2(save_stdout, 1) == -1) {
-        perror("dup2(2)");
-        exit(1);
-    }
     freeCharEnv();
     return 1;
 }

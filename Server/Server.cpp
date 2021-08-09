@@ -27,7 +27,7 @@ void Server::_getServerAddr() {
 }
 
 void Server::_lstn(int sock) {
-	if (-1 == ::listen(sock, 3)) {
+	if (-1 == listen(sock, 3)) {
 		perror("listen");
 		exit(1);
 	}

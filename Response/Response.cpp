@@ -38,9 +38,27 @@ void Response::send(std::string filepath) {
 		+ "\n"
 		+ getBody();
 
-	// std::cout << "===============RESPONSE=================" << std::endl;
-	// std::cout << response << std::endl;
-	// std::cout << "========================================" << std::endl;
+	std::cout << "===============RESPONSE=================" << std::endl;
+	std::cout << response << std::endl;
+	std::cout << "========================================" << std::endl;
+
+	int bytes_sent = write(_client_fd, response.c_str(), response.size());
+
+	if (response.size() == bytes_sent)
+		std::cout << "all data sent" << std::endl;
+	else
+		std::cout << "part of data sent" << std::endl;
+}
+
+void Response::send() {
+	setHeader("Connection", "Keep-Alive");
+	setHeader("Keep-Alive", "timeout=5, max=10");
+	setHeader("Status", getStatus());
+	setHeader("date", getCurrentUTCDate());
+
+	std::string response = 
+	getStartingLine()
+	+ getHeaders();
 
 	int bytes_sent = write(_client_fd, response.c_str(), response.size());
 
