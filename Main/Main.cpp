@@ -121,9 +121,13 @@ void Main::routing(Request& request, Response& response, Configuration* serverCo
 			response.send("pages/form.html");
 		else if (request.getMethod() == "POST") {
 			response.setStatus("201 Created");
-			response.send();
 			CGI cgi(request, serverConfig);
-			cgi.execute("CGI/formHandler");
+			if (cgi.execute("CGI/formHandler")) {
+				response.send();
+				std::cout << "send for POST" << std::endl;
+			}
+			else
+				std::cout << "cgi error" << std::endl;
 		}
 	}
 	else if (request.getPath() == "/uploading") {

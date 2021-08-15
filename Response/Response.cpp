@@ -24,7 +24,7 @@ std::string Response::getStartingLine() {return _protocolV + " " + _status + "\n
 std::string Response::getStatus() {return _status;}
 std::string Response::getBody() {return _body;}
 
-void Response::send(std::string filepath) {
+void Response::send(std::string filepath) { // for GET
 	_body = readFile(filepath);
 	setHeader("Content-Length", std::to_string(_body.size()));
 	setHeader("Connection", "Keep-Alive");
@@ -50,11 +50,12 @@ void Response::send(std::string filepath) {
 		std::cout << "part of data sent" << std::endl;
 }
 
-void Response::send() {
+void Response::send() { // for POST
 	setHeader("Connection", "Keep-Alive");
 	setHeader("Keep-Alive", "timeout=5, max=10");
 	setHeader("Status", getStatus());
 	setHeader("date", getCurrentUTCDate());
+	setHeader("Content-Length", "0");
 
 	std::string response = 
 	getStartingLine()

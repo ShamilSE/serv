@@ -15,14 +15,19 @@ void CGI::setEnv(std::string key, std::string value) {_env[key] = value;}
 void CGI::initEnv() {
 	setEnv("GATEWAY_INTERFACE", "CGI/1.1");
 	// this->_env["SCRIPT_NAME"] = config.getPath();
+    // setEnv("SCRIPT_NAME", "/Users/mismene/Desktop/serv/CGI");
 	// this->_env["SCRIPT_FILENAME"] = config.getScriptPath();
+    // setEnv("SCRIPT_FILENAME", "formHandler");
 	setEnv("REQUEST_METHOD", "\"" + request.getMethod() + "\"");
 	setEnv("CONTENT_LENGTH", "\"" + request.getHeaderByKey("Content-Length") + "\"");
 	setEnv("CONTENT_TYPE", "\"" + request.getHeaderByKey("Content-Type") + "\"");
 	// this->_env["PATH_INFO"] = request.getPath(); //might need some change, using config path/contentLocation
+    // setEnv("SCRIPT_NAME", "/Users/mismene/Desktop/serv/CGI");
 	// this->_env["PATH_TRANSLATED"] = request.getPath(); //might need some change, using config path/contentLocation
+    // setEnv("SCRIPT_NAME", "/Users/mismene/Desktop/serv/CGI");
 	setEnv("QUERY_STRING", "\"" + request.getPath() + "\"");
 	// this->_env["REMOTEaddr"] = to_string(config.getHostPort().host);
+    // setEnv("REMOTEAddr", 0);
     setEnv("SERVER_NAME", "\"" + request.getClientServerName() + "\"");
 	setEnv("SERVER_PORT", "\"" + request.getClientServerPort() + "\"");
 	setEnv("SERVER_PROTOCOL", "\"" + request.getProtocolV() + "\"");
